@@ -37,19 +37,22 @@ jobs:
           echo "LOG_LEVEL=DEBUG" >> $GITHUB_ENV
         fi
 
+ 
     - name: Package Lambda Function (Amazon Linux compatible)
       run: |
         cd lambda_function
 
-        docker run --rm -v "$PWD":/var/task public.ecr.aws/lambda/python:3.11 \
-        /bin/bash -c "
-          pip install -r requirements.txt -t /var/task/package
-        "
+        docker run --rm \
+          -v "$PWD":/var/task \
+          --entrypoint /bin/bash \
+          public.ecr.aws/lambda/python:3.11 \
+          -c "pip install -r requirements.txt -t /var/task/package"
 
         cp app.py package/
         cd package
         zip -r ../../lambda.zip .
         cd ../..
+
 
     - name: Deploy to AWS Lambda
       env:
