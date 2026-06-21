@@ -42,11 +42,14 @@ jobs:
       run: |
         cd lambda_function
 
+        rm -rf package
+        mkdir package
+
         docker run --rm \
           -v "$PWD":/var/task \
           --entrypoint /bin/bash \
           public.ecr.aws/lambda/python:3.11 \
-          -c "pip install -r requirements.txt -t /var/task/package"
+          -c "pip install --no-cache-dir --only-binary=:all: -r requirements.txt -t /var/task/package"
 
         cp app.py package/
         cd package
